@@ -95,7 +95,7 @@ i32 sockret[MAXPLAYERS];
 void serverRecvTimer(u8 id){
 	Sleep(15);
 	while(sockret[id]!=0){
-		//VEC3addVEC3(&player[id],playerVel[id]);
+		VEC3addVEC3(&player[id],playerVel[id]);
 		Sleep(15);
 	}
 }
@@ -130,8 +130,9 @@ void serverSend(u8 *clientID){
 
 void serverRecv(u8 id){
 	for(;;){
-		serverRecvTimer(id);
+		HANDLE serverRecvTimerThread = CreateThread(0,0,serverRecvTimer,0,0,0);
 		sockret[id] = recv(client[id],&player[id],sizeof(PLAYER),0);
+		TerminateThread(serverRecvTimerThread,0);
 		if(sockret[id] == -1 || sockret[id] == 0){
 			if(WSAGetLastError() == WSAECONNRESET){
 				closesocket(client[id]);
